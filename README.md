@@ -1,0 +1,1 @@
+#Wildcard - Balatro Mod Manager
