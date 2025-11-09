@@ -7,6 +7,7 @@
 
   import modLinks from "$lib/modlinks.txt?raw";
   import modLinksAdv from "$lib/modlinksAdvanced.json";
+  import nexusModLinks from "$lib/nexus.json";
   import { appDataDir, BaseDirectory } from "@tauri-apps/api/path";
 
   let ModDirectory = "";
@@ -128,7 +129,7 @@
 
   function TagBySHA(
     repo: string,
-    sha: string
+    sha: string,
   ): { tag: string; sha: string; date?: string } {
     let tags = releaseTagsByMod.get(repo)?.tags;
     if (tags) {
@@ -145,7 +146,7 @@
     owner: string,
     repo: string,
     disp_name?: string,
-    star = false
+    star = false,
   ) {
     let repoTags: RepoTags = { owner, repo, tags: [], displayName: repo, star };
     if (disp_name) {
@@ -188,7 +189,7 @@
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
           },
-        }
+        },
       )
       .then((res) => {
         type SHAFilter = {
@@ -214,7 +215,8 @@
     await invoke("nuke_directory", { path: ModDirectory });
     pullPromises = [];
     for (let i = 0; i < modPull.length; i++) {
-      let repo_sha = modPull[i].split("-");
+      let repo_sha = modPull[i].split("|");
+      console.log(repo_sha)
       let owner = releaseTagsByMod.get(repo_sha[0])?.owner;
 
       let promise: Promise<void>;
@@ -226,7 +228,7 @@
           promise = clone(owner, repo_sha[0], repo_sha[1]);
         }
       } else {
-        let modName = repo_sha[1];
+        let modName = repo_sha[0];
         let modURL: string = "";
         for (let i = 0; i < modLinkAdvList.length; i++) {
           let mod = modLinkAdvList[i];
@@ -246,11 +248,11 @@
   }
 
   onMount(async () => {
-    let path: string = await appDataDir()
-    path = path.replaceAll("com.wildcard.app", "")
-    path += "Balatro\\Mods"
+    let path: string = await appDataDir();
+    path = path.replaceAll("com.wildcard.app", "");
+    path += "Balatro\\Mods";
 
-    ModDirectory = path
+    ModDirectory = path;
 
     octokit = new Octokit({ auth: GITHUB_KEY });
 
@@ -334,7 +336,7 @@
                   for (let i = 0; i < modPull.length; i++) {
                     let modName = modPull[i].substring(
                       0,
-                      modPull[i].lastIndexOf("-")
+                      modPull[i].lastIndexOf("|"),
                     );
                     if (repoInfo) {
                       if (modName == repoInfo.repo) {
@@ -348,7 +350,7 @@
                       }
                     }
                   }
-                  modPull.push(`${name}-${modSelects[name]}`);
+                  modPull.push(`${name}|${modSelects[name]}`);
                   modPull = modPull;
                 }}>Add Mod</button
               >
@@ -364,7 +366,7 @@
       {#each modPull as pull, i}
         <div class="flex flex-row gap-2 items-center">
           <div>
-            {pull}
+            {pull.replaceAll("|", "-")}
           </div>
           {#if pullPromises[i]}
             <div class="w-6">

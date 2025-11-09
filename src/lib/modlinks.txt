@@ -26,3 +26,6 @@ https://github.com/Catzzadilla/Main-Menu-Tweaks
 https://github.com/GitNether/balagay
 https://github.com/MamiKeRiko/Rofflatro
 https://github.com/MarioFan597/Ascensio
+https://github.com/DivvyCr/Balatro-Preview#DVPreview
+https://github.com/DivvyCr/Balatro-Settings#DVSettings
+https://github.com/DivvyCr/Balatro-Simulation#DVSimulation
